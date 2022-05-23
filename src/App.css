@@ -1,5 +1,10 @@
 .App {
   text-align: center;
+  background-color: pink;
+  position: absolute;
+  width: 100%;
+  top: 40px;
+  bottom: 20px;
 }
 
 .App-logo {
@@ -35,4 +40,13 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.Header {
+  background-color: #ffc0fb;
+  position: absolute;
+  width: 100%;
+  height: 40px;
+  font-size: 30px;
+  text-align: center;
 }
