@@ -72,21 +72,46 @@ class App extends React.Component {
 
   //Use 20 matchids from state to get match results.
   //have to make 3 separate arrays for kills, assists, deaths for every 20 games
-  getMatches() {
+  async getMatches() {
     console.log("ran")
+    let index = 0;
+    let tempKills = [];
+    let tempDeaths = [];
+    let tempAssists = [];
+    
     this.state.matchIds.forEach((idVal) => {
+      //if match is the 2nd to last, stop
+      if(index > 14) return;
       let match1 = idVal;
       let url = "https://americas.api.riotgames.com/lol/match/v5/matches/" + match1 + "?api_key=" + apikey;
       fetch(url)
       .then(response => response.json())
       .then((data) => {
-        this.setState(prevState => ({
-          matchKills: [...prevState.matchKills, data.info.participants[0].kills],
-          matchAssists: [...prevState.matchAssists, data.info.participants[0].assists],
-          matchDeaths: [...prevState.matchDeaths, data.info.participants[0].deaths],
-        }))
+        let playerIndex = 0;
+        let forIndex = 0;
+
+        //loop through to find user index for this match
+        data.info.participants.forEach((participant) => {
+          if(participant.puuid == this.state.puuid) {
+            playerIndex = forIndex;
+          }
+          forIndex++;
+        })
+        console.log("INDEX: " + playerIndex);
+        //add to current tracker of values arrays.
+        tempKills.push(data.info.participants[playerIndex].kills);
+        console.log(tempKills);
+        tempAssists = [...tempAssists, data.info.participants[playerIndex].assists];
+        tempDeaths = [...tempDeaths, data.info.participants[playerIndex].deaths];
       })
+      index++;
     }) 
+    console.log(tempKills);
+    await this.setState({
+      matchKills: tempKills,
+      matchDeaths: tempDeaths,
+      matchAssists: tempAssists,
+    });
   }
 
   //display stats for individual player function
@@ -104,9 +129,10 @@ class App extends React.Component {
     
     let AllMatches = this.state.matchKills.map((kills, index) => {
       return (
-        <DisplayStats key={index} ind={index} kills={this.state.matchKills[index]} deaths={this.state.matchDeaths[index]} assists = {this.state.matchAssists[index]} />
+        <DisplayStats key={index} ind={index + 1} kills={this.state.matchKills[index]} deaths={this.state.matchDeaths[index]} assists = {this.state.matchAssists[index]} />
       )
     })
+    console.log(this.state);
 
     return (
       <div>
@@ -114,12 +140,7 @@ class App extends React.Component {
           <h1 className="Header"> Lol Stats </h1>
           <h1>Hello World!</h1>
           {this.state.name !== "" ? "Summoner: " + this.state.name: ""}
-          <br />
           <Addform getUsername={this.getUsername}/>
-          {this.state.name !== "" ? <button onClick={() => this.getMatchIds(this.state.puuid)}> Get match history </button>: ""}
-          <button onClick={this.getMatches}> Get Matches </button>
-          {this.state.puuid}
-          {this.state.matchIds}
           {AllMatches}
         </div>
       </div>
