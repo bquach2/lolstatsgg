@@ -1,3 +1,3 @@
-let apikey = "RGAPI-7a4fd63e-7f56-4374-8dfc-03ea7494297e"
+let apikey = "RGAPI-3c73131d-933b-4e64-9970-cc19d16c28d3"
 
 export default apikey
